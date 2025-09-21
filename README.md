@@ -65,12 +65,42 @@ You can adjust search parameters, for example:
 python -m dotenv run -- python -m checkpoint_3.main --beam 3 --depth 3
 ```
 
+### Start the API server (FastAPI + Uvicorn)
+The UI calls a REST API defined in `api/server.py`.
+
+- Start the server (hot reload):
+```bash
+uvicorn api.server:app --reload --host 0.0.0.0 --port 8000
+```
+
+- Optional: set allowed CORS origins (comma-separated). Defaults to `http://localhost:3000,http://localhost:5173`.
+```bash
+export CORS_ORIGINS="http://localhost:5173"
+uvicorn api.server:app --reload --host 0.0.0.0 --port 8000
+```
+
+- Health check:
+```bash
+curl http://localhost:8000/healthz
+```
+
+- Move endpoint (example body):
+```bash
+curl -X POST http://localhost:8000/api/v1/move \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "mode": "cot",
+    "player": "O",
+    "board": [null,null,null,null,null,null,null,null,null]
+  }'
+```
+
 ### Troubleshooting
 - Missing API key: Ensure `OPENAI_API_KEY` is set. For checkpoint 3, prefer running via:
 ```bash
 python -m dotenv run -- python -m checkpoint_3.main
 ```
-- Virtualenv not active: If `python` points to a system interpreter, re-run `source .venv/bin/activate` (Linux/macOS) or `.\.venv\Scripts\Activate.ps1` (Windows PowerShell).
+- Virtualenv not active: If `python` points to a system interpreter, re-run `source .venv/bin/activate` (Linux/macOS) or `\.\.venv\Scripts\Activate.ps1` (Windows PowerShell).
 - Network/429 errors: Reduce request rate or retry; ensure the key has access to the specified model in `checkpoint_3/config.py` (default `gpt-4o-mini`).
 
 ### Project layout (key files)

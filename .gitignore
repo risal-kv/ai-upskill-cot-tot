@@ -137,3 +137,10 @@ marimo/_lsp/
 __marimo__/
 
 .DS_Store
+
+# Frontend artifacts (global)
+node_modules/
+dist/
+.vite/
+.env
+.eslintcache

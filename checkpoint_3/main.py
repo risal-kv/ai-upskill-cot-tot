@@ -1,8 +1,8 @@
 from __future__ import annotations
 import argparse
 
-from checkpoint_4.config import SEARCH_MAX_DEPTH
-from checkpoint_4.play import play_interactive
+from checkpoint_3.config import SEARCH_MAX_DEPTH
+from checkpoint_3.play import play_interactive
 
 
 def main():

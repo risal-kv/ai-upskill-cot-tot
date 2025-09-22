@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Board from './Board';
 import ReasoningPanel from './Reasoning/ReasoningPanel';
-import { applyMove, createEmptyBoard, evaluateBoard, getNextPlayer } from '../lib/game';
+import { applyMove, createEmptyBoard, evaluateBoard, getNextPlayer } from '../library/game';
 import type { AiResponse, Board as BoardType, Mode, Player } from '../types';
-import { requestAiMove } from '../lib/api';
+import { requestAiMove } from '../library/api';
 
 interface GameProps {
 	initialMode?: Mode;

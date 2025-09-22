@@ -23,6 +23,7 @@ from tools import (
     get_shipment,
     get_shipment_by_order_id,
     get_order_by_customer_id,
+    cancel_order,
 )
 from prompt import SYSTEM_PROMPT_TEMPLATE_FOR_CHECKPOINT_6
 
@@ -38,6 +39,7 @@ class CustomerServiceAgent:
             get_shipment,
             get_shipment_by_order_id,
             get_order_by_customer_id,
+            cancel_order,
         ]
         self.llm_with_tools = self.llm.bind_tools(self.tools)
         self.tools_by_name = {tool.name: tool for tool in self.tools}

@@ -2,24 +2,18 @@
 
 import streamlit as st
 import pandas as pd
-from agent import create_agent as create_agent_main
-from agent_checkpoints.agent_checkpoint_6 import (
-    create_agent as create_agent_checkpoint_6,
+from agent_checkpoints.react_checkpoint import (
+    create_agent as create_react_checkpoint,
 )
-from agent_checkpoints.agent_checkpoint_cancellation import (
-    create_agent as create_agent_checkpoint_cancellation,
-)
-from agent_checkpoints.agent_with_chat_history import (
-    create_agent as create_agent_with_chat_history,
+from agent_checkpoints.cot_checkpoint import (
+    create_agent as create_cot_checkpoint,
 )
 from tools import ORDERS_TABLE, SHIPMENTS_TABLE
 from dotenv import load_dotenv
 
 list_of_agents = {
-    "agent": create_agent_main,
-    "agent_checkpoint_6": create_agent_checkpoint_6,
-    "agent_checkpoint_cancellation": create_agent_checkpoint_cancellation,
-    "agent_with_chat_history": create_agent_with_chat_history,
+    "react_checkpoint": create_react_checkpoint,
+    "cot_checkpoint": create_cot_checkpoint,
 }
 
 load_dotenv()
@@ -48,10 +42,10 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 if "selected_agent" not in st.session_state:
-    st.session_state.selected_agent = "agent_checkpoint_6"
+    st.session_state.selected_agent = "react_checkpoint"
 
 if "user_selected_agent" not in st.session_state:
-    st.session_state.user_selected_agent = "agent_checkpoint_6"
+    st.session_state.user_selected_agent = "react_checkpoint"
 
 if (
     "agent" not in st.session_state

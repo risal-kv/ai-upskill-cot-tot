@@ -256,61 +256,24 @@ def get_shipment_by_order_id(order_id: int) -> Dict[str, Any]:
 @tool
 def cancel_order(order_id: int) -> Dict[str, Any]:
     """
-    Attempt to cancel an order, enforcing simple business rules.
-
-    Business rules:
-    - Orders with status "pending" or "processing" can be cancelled.
-    - Orders with status "shipped" or beyond cannot be cancelled via support; suggest return policy instead.
+    Cancel an order by order ID
 
     Args:
         order_id: The order ID to cancel
 
     Returns:
-        Dictionary indicating success, updated order data, and a user-friendly message
+        Dictionary containing success status and message
     """
     if isinstance(order_id, str):
         order_id = int(order_id)
-
-    order = ORDERS_TABLE.get(order_id)
-    if not order:
-        return {
-            "success": False,
-            "data": f"Order {order_id} not found",
-            "message": f"Order {order_id} not found",
-        }
-
-    cancellable_statuses = {"pending", "processing"}
-    non_cancellable_statuses = {"shipped", "delivered", "cancelled"}
-
-    if order.status in non_cancellable_statuses:
-        return {
-            "success": False,
-            "data": order.model_dump(),
-            "message": (
-                f"Order {order_id} is {order.status} and cannot be cancelled. "
-                "If already shipped or delivered, you may return the product within the return window."
-            ),
-        }
-
-    if order.status in cancellable_statuses:
-        # mutate in-memory order status
-        order.status = "cancelled"
-        updated = order.model_dump()
-        # Add default cancellation reason to metadata
-        updated_metadata = dict(updated.get("product_metadata", {}))
-        updated_metadata["cancellation_reason"] = "Customer requested cancellation"
-        updated["product_metadata"] = updated_metadata
-        # reflect in object for consistency
-        order.product_metadata = updated_metadata
-
-        return {
-            "success": True,
-            "data": updated,
-            "message": f"Order {order_id} has been cancelled successfully.",
-        }
-
-    return {
-        "success": False,
-        "data": order.model_dump(),
-        "message": f"Order {order_id} cannot be cancelled in its current status: {order.status}",
-    }
+    if order_id in ORDERS_TABLE:
+        order = ORDERS_TABLE[order_id]
+        if order.status in ["shipped", "delivered"]:
+            return {
+                "success": False,
+                "message": f"Order {order_id} cannot be canceled as it is already {order.status}.",
+            }
+        order.status = "canceled"
+        return {"success": True, "message": f"Order {order_id} has been canceled."}
+    else:
+        return {"success": False, "message": f"Order {order_id} not found."}

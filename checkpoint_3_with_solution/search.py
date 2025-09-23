@@ -1,5 +1,4 @@
 from __future__ import annotations
-import random
 from typing import List, Optional, Tuple, cast
 
 from .config import SEARCH_MAX_DEPTH, OPENAI_MODEL, dbg
@@ -155,20 +154,53 @@ async def find_best_path_with_tree(
         dbg(depth, f"  ⚠️ No legal moves. Returning 0.")
         return 0, []
 
-    # TODO 1. Implement inital thought generation using`
+    # 4) Candidate generation (uses _fetch_proposals)
+    proposals: List[Move] = await _fetch_proposals(
+        game=game,
+        legal=legal,
+        to_move=to_move,
+        model_name=model_name,
+        api_key=api_key,
+    )
 
-    # TODO 2. Score and expand each thought
+    # 5) Scoring and child-node expansion (uses _score_and_expand_children)
+    entries = _score_and_expand_children(
+        game=game,
+        proposals=proposals,
+        to_move=to_move,
+        tree=tree,
+        parent_node_id=parent_node_id,
+    )
 
-    # TODO 3. Keep top-k candidates using based on beam_width
+    # 6) Beam selection (uses _beam_select)
+    entries = _beam_select(entries, to_move=to_move, beam_width=beam_width)
 
-    # TODO 4. Recursively generate thoughts for selected children uptill max depth
+    # 7) Recurse into selected children (recursion remains here)
+    best_score: Optional[int] = None
+    best_path: List[PathStep] = []
 
+    for m, s, next_state, child_id in entries:
+        score_down, path_down = await find_best_path_with_tree(
+            next_state,
+            to_move=('X' if to_move == 'O' else 'O'),
+            tree=tree,
+            parent_node_id=child_id,
+            model_name=model_name,
+            api_key=api_key,
+            beam_width=beam_width,
+            max_depth=max_depth,
+            depth=depth + 1,
+        )
+        overall_score = score_down  # already from O's perspective
 
-    # Dummy implementation
-    (r, c) = random.choice(sorted(list(legal)))
-    reason = "Randomly generated position"
-    best_path = [PathStep(player=to_move, row=r, col=c, reason=reason, score_after=0)]
-    best_score = 0
+        if best_score is None:
+            best_score = overall_score
+            best_path = [PathStep(player=to_move, row=m.row, col=m.col, reason=m.reason, score_after=s)] + path_down
+        else:
+            better = (to_move == 'O' and overall_score > best_score) or (to_move == 'X' and overall_score < best_score)
+            if better:
+                best_score = overall_score
+                best_path = [PathStep(player=to_move, row=m.row, col=m.col, reason=m.reason, score_after=s)] + path_down
 
     assert best_score is not None
     return cast(int, best_score), best_path

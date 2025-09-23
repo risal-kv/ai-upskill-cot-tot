@@ -116,7 +116,7 @@ function wrapText(text: string, maxChars: number): string[] {
 function NodeBox({ n, onToggle, isCollapsed, hasChildren }: { n: LaidOutNode; onToggle: (id: string) => void; isCollapsed: boolean; hasChildren: boolean; }) {
 	const title = n.node.thought || '—';
 	const reason = n.node.reason || '';
-	const scoreStr = typeof n.node.score === 'number' ? ` (${(n.node.score * 100) | 0}%)` : '';
+	const scoreStr = typeof n.node.score === 'number' ? ` [score: ${n.node.score}]` : '';
 	const titleLines = wrapText(title + scoreStr, 28);
 	const reasonLines = wrapText(reason, 34);
 	const handleClick = (e: React.MouseEvent) => {

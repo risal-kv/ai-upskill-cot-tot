@@ -31,7 +31,7 @@ class TreeNode(BaseModel):
     id: Optional[str] = None
     thought: str
     reason: str
-    score: Optional[float] = None  # normalized 0..1 for UI percent
+    score: Optional[float] = None  # raw heuristic score (e.g., -100..100)
     children: Optional[List['TreeNode']] = None
 
 

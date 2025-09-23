@@ -86,7 +86,7 @@ def node_to_treenode(tree: ThoughtTree, nid: int) -> TreeNode:
         thought = f"{n.player}→({n.r},{n.c})"
         if n.terminal and n.outcome:
             thought += f" [terminal: {n.outcome}]"
-    score = normalize_score(n.score_after) if isinstance(n.score_after, (int, float)) else None
+    score = n.score_after if isinstance(n.score_after, (int, float)) else None
     children = [node_to_treenode(tree, cid) for cid in n.children] if n.children else []
     return TreeNode(
         id=str(n.id),

@@ -117,6 +117,7 @@ export function Game({ initialMode = 'cot', startingPlayer = 'X' }: GameProps) {
 						<select value={mode} onChange={(e) => setMode(e.target.value as Mode)} disabled={loading}>
 							<option value="cot">CoT</option>
 							<option value="tot">ToT</option>
+							<option value="tot-langchain">ToT-LangChain</option>
 						</select>
 					</label>
 					<label>

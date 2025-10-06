@@ -5,7 +5,7 @@ export type CellValue = Player | null;
 // Board is a 1D array of 9 cells [0..8]
 export type Board = CellValue[];
 
-export type Mode = 'cot' | 'tot';
+export type Mode = 'cot' | 'tot' | 'tot-langchain';
 
 export interface CotResponse {
 	mode: 'cot';
@@ -28,7 +28,14 @@ export interface TotResponse {
 	tree: TreeNode; // full tree-of-thought structure
 }
 
-export type AiResponse = CotResponse | TotResponse;
+export interface TotLangchainResponse {
+	mode: 'tot-langchain';
+	move: number; // 0..8 index chosen by AI
+	reasoning: string; // overall ToT summary reasoning
+	tree: TreeNode; // full tree-of-thought structure
+}
+
+export type AiResponse = CotResponse | TotResponse | TotLangchainResponse;
 
 export interface EvaluationResult {
 	winner: Player | null;

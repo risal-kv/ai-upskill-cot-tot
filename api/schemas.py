@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field, model_validator
 
 
 class MoveRequest(BaseModel):
-    mode: Literal['cot', 'tot']
+    mode: Literal['cot', 'tot', 'tot-langchain']
     # Frontend uses 1D board[0..8] with null, 'X', 'O'
     board: List[Optional[str]] = Field(min_length=9, max_length=9)
     player: Literal['X', 'O'] = 'O'  # AI plays as which mark
@@ -36,7 +36,7 @@ class TreeNode(BaseModel):
 
 
 class TotResponse(BaseModel):
-    mode: Literal['tot']
+    mode: Literal['tot', 'tot-langchain']
     move: int  # 0..8 index
     reasoning: str
     tree: TreeNode

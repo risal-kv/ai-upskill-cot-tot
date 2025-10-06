@@ -40,9 +40,11 @@ export function ReasoningPanel({ response, cotHistory }: ReasoningPanelProps) {
 		}
 	};
 
+	const title = response.mode === 'tot-langchain' ? 'AI Reasoning (ToT-LangChain)' : 'AI Reasoning (ToT)';
+	
 	return (
 		<section className="reasoning-panel">
-			<h3>AI Reasoning (ToT)</h3>
+			<h3>{title}</h3>
 			{response.reasoning && (
 				<pre className="reasoning-text">{response.reasoning}</pre>
 			)}

@@ -130,6 +130,49 @@ async def run_tot(board_1d: List[Optional[str]], player: str, beam: Optional[int
     return TotResponse(mode='tot', move=move_idx, reasoning=reasoning, tree=ui_tree)
 
 
+# --- ToT with LangChain adapter (checkpoint_4) ---
+from checkpoint_4.game import TicTacToe as TTT4
+from checkpoint_4.scoring import simple_score_state as score_state_4
+from checkpoint_4.tree import ThoughtTree as ThoughtTree4
+from checkpoint_4.search import find_best_path_with_tree as find_best_4
+
+
+async def run_tot_langchain(board_1d: List[Optional[str]], player: str, beam: Optional[int], depth: Optional[int]) -> TotResponse:
+    """
+    Run ToT using checkpoint_4 which uses LangChain's ToTChain for thought generation.
+    """
+    game = TTT4()
+    game.board = board1d_to_matrix(board_1d)
+
+    # Seed tree with current state's heuristic (always score from O's perspective in scoring)
+    start_score = score_state_4(game.board, agent="O")
+    tree = ThoughtTree4()
+    root_id = tree.add_root(score_after=start_score)
+
+    best_score, best_path = await find_best_4(
+        game,
+        to_move=player,
+        tree=tree,
+        parent_node_id=root_id,
+        beam_width=beam or 2,
+        max_depth=depth or 2,
+    )
+
+    # Take first step as move
+    if not best_path:
+        raise HTTPException(status_code=400, detail="No path found by ToT-LangChain search")
+    first = best_path[0]
+    move_idx = pos_to_index(first.row, first.col)
+
+    # Serialize thought tree to UI TreeNode
+    ui_tree = node_to_treenode(tree, tree.root_id) if tree.root_id is not None else TreeNode(thought='root', reason='', children=[])
+
+    # Derive a summary reasoning (optional): use top step's reason
+    reasoning = first.reason or ""
+
+    return TotResponse(mode='tot-langchain', move=move_idx, reasoning=reasoning, tree=ui_tree)
+
+
 @app.get("/healthz")
 async def healthz():
     return {"ok": True}
@@ -141,5 +184,7 @@ async def move(req: MoveRequest):
         return await run_cot(req.board, player=req.player)
     elif req.mode == 'tot':
         return await run_tot(req.board, player=req.player, beam=req.beam, depth=req.depth)
+    elif req.mode == 'tot-langchain':
+        return await run_tot_langchain(req.board, player=req.player, beam=req.beam, depth=req.depth)
     else:
         raise HTTPException(status_code=400, detail="Invalid mode") 
